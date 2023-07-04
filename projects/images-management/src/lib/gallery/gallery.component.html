@@ -1,0 +1,32 @@
+<ion-card class="">
+  <ion-card-header>
+    <ion-card-title>{{ title }}</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+
+    <div class="rows" *ngIf="sourceDisplayedPhotos.length">
+      <div *ngFor="let source of sourceDisplayedPhotos">
+        <div class="container_button">
+          <ion-button mode="md" shape="round" size="small" (click)="presentAlertRemove(source)" color="danger"
+            class="remove_photo_button">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+          <ion-img [src]="source|readFile:update|async" (click)="openImageViewer(source)" class="img_"></ion-img>
+        </div>
+      </div>
+
+    </div>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col offset="6"></ion-col>
+        <ion-col size="4" class="ion-text-end">
+          <app-take-photo [compress]="compress" [imagesModel]="imagesModel" (imagesModelChange)="imagesModelChangeF($event)"></app-take-photo>
+          <app-file-picker [compress]="compress" [imagesModel]="imagesModel"
+          (imagesModelChange)="imagesModelChangeF($event)"></app-file-picker>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>

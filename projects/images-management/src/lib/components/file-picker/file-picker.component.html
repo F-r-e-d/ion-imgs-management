@@ -1,0 +1,7 @@
+<ion-button mode="md" shape="round" (click)="compressFile()" [color]="color" class="picker_button">
+  <ion-icon *ngIf="!isLoading" [slot]="buttonText ? 'start' : 'icon-only'" name="folder-outline"></ion-icon>
+  <ion-spinner *ngIf="isLoading" name="circular"></ion-spinner>
+
+  {{ buttonText ? buttonText : null }}
+</ion-button>
+<!-- <button (click)="filepickerService.compressFile()">Upload and compress Image</button> -->

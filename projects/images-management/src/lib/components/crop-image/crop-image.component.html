@@ -1,0 +1,36 @@
+<ion-grid class="ion-justify-content-center ion-align-items-center d_grid">
+  <ion-row>
+    <ion-col size="12" class="ion-text-center">
+      <div  class="ion-text-center">
+      <ion-thumbnail class="skeleton"*ngIf="!base64" >
+        <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+      </ion-thumbnail>
+    </div>
+    <image-cropper *ngIf="base64" [imageBase64]="base64" [maintainAspectRatio]="false" [aspectRatio]="4 / 3" format="jpeg"
+      output="base64"
+      (imageCropped)="imageCropped($event)">
+    </image-cropper>
+  </ion-col>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          {{croppedImage.width ? (croppedImage.width + 'x' + croppedImage.height) : ''}}
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" class="ion-text-end">
+          <ion-button (click)="validCrop()" color="success">
+            <ion-icon slot="icon-only" size="large" name="checkmark-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-row>
+</ion-grid>
+
+<ion-fab vertical="top" horizontal="end" slot="fixed">
+  <ion-fab-button color="light" (click)="close()">
+    <ion-icon name="close-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

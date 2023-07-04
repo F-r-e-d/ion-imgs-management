@@ -1,0 +1,44 @@
+
+.vertical-align-content > *
+{
+  width: 100%;
+  height: 100%;
+
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+}
+
+.wrapper{
+  width: 50%;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pz-zoom-button.pz-zoom-control-position-bottom {
+  /* bottom: -100px !important; */
+  display: none;
+}
+
+.d_grid {
+  display: grid;
+}
+
+#ion-overlay-3 {
+  --width: 90% !important;
+  --height: 90% !important;
+}
+
+.absolute_bottom {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+
+ /* ion-grid > ion-row > ion-col > pinch-zoom > div > img {
+  max-height: 500px;
+} */
+
+

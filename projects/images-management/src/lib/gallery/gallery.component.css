@@ -1,0 +1,77 @@
+.wrapper {
+  width: 50%;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container_button {
+  position: relative;
+  border: rgb(0 0 0 / 22%) 1px solid;
+  border-radius: 10px;
+  cursor: pointer;
+  height: 200px;
+  width: 150px;
+  display: grid;
+}
+
+.img_::part(image) {
+  border-radius: 10px;
+}
+
+.remove_photo_button {
+  position: absolute;
+  top: -20px;
+  left: -18px;
+  width: 28px;
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+}
+/* .edit_photo_button {
+  width: 35px;
+  height: 35px;
+
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  z-index: 11;
+} */
+
+
+.crop_button {
+  width: 60px;
+  height: 60px;
+
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+}
+
+.z_index_10 {
+  z-index: 10 !important;
+}
+
+.rows {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-rows: repeat(auto, 50px);
+  align-items: center;
+  justify-content: space-between;
+}
+
+ion-modal{
+  --width: 90% !important;
+  --height: 90% !important;
+}
+
