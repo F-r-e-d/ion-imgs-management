@@ -1,8 +1,12 @@
 {
   "name": "images-management",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "publishConfig": {
     "registry": "http://localhost:4873"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/F-r-e-d/ion-imgs-management"
   },
   "peerDependencies": {
     "@angular/cdk": "^16.1.3",
