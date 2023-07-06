@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "images-management": {
+      "name": "images-management",
+      "integrations": {
+        "capacitor": {}
+      },
+      "type": "angular",
+      "root": "projects/images-management"
+    }
+  },
+  "integrations": {
+    "capacitor": {}
+  },
+  "defaultProject": "images-management"
+}

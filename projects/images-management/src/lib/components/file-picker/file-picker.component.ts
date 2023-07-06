@@ -10,7 +10,7 @@ import { FilepickerService } from '../../services/filepickerService/filepicker.s
   styleUrls: ['./file-picker.component.scss'],
 })
 export class FilePickerComponent implements OnInit {
-  @Input() compress: boolean = true;
+  @Input() compress: boolean = false;
 
   @Input() imagesModel: Array<Record<string, any>> = [];
   @Output() imagesModelChange: EventEmitter<Array<Record<string, any>>> = new EventEmitter();

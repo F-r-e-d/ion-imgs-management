@@ -1,0 +1,7 @@
+{
+  "name": "images-management",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

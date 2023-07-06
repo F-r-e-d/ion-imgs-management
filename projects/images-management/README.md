@@ -8,6 +8,9 @@ images-management is a Ionic 7 Angular 16 library. It's include grid diplay img,
 
 ```bash
 npm install images-management
+npm install @capacitor/filesystem
+npm install @capacitor/camera
+npx cap sync
 ```
 
 ## Usage
@@ -56,11 +59,10 @@ import { ImagesManagementService } from 'images-management';
   constructor(private imgManagementService: ImagesManagementService) {}
 
 
+# Thanks to the wonderful librairies
 
-# Thanks to wonderfull packages
-
-"@meddv/ngx-pinch-zoom"
-"browser-image-compression"
-"markerjs2"
-"ngx-image-compress"
-"ngx-image-cropper"
+- @meddv/ngx-pinch-zoom
+- browser-image-compression
+- markerjs2
+- ngx-image-compress
+- ngx-image-cropper

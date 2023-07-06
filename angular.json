@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "imagesManagement": {
+    "images-management": {
       "projectType": "library",
       "root": "projects/images-management",
       "sourceRoot": "projects/images-management/src",

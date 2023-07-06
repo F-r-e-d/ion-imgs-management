@@ -14,6 +14,7 @@ import { ReadFilePipe } from './pipes/readFile/read-file.pipe';
 import 'hammerjs/hammer';
 import { TakePhotoComponent } from './components/take-photo/take-photo.component';
 import { ImagesManagementService } from './images-management.service';
+import { NgxImageCaptureModule } from 'ngx-image-compress';
 
 @NgModule({
   providers: [ImagesManagementService],
@@ -31,7 +32,8 @@ import { ImagesManagementService } from './images-management.service';
     CommonModule,
     IonicModule,
     PinchZoomModule,
-    ImageCropperModule
+    ImageCropperModule,
+    NgxImageCaptureModule
   ],
   exports: [
     GalleryComponent,

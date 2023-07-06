@@ -32,7 +32,7 @@ export class GalleryComponent {
   >();
 
   @Input() title: string = '';
-  @Input() compress: boolean = true;
+  @Input() compress: boolean = false;
 
   public sourceDisplayedPhotos: any = [];
   public isLoading = false;
