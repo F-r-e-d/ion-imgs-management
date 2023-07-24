@@ -1,17 +1,11 @@
 <ion-grid class="ion-justify-content-center ion-align-items-center d_grid">
-
   <ion-row>
     <ion-col>
-      <pinch-zoom [backgroundColor]="'rgba(0,0,0,0)'" [overflow]="'visible'" [limit-zoom]="4">
-        <img [src]="imageSourceUrl|readFile:update|async" class="img" />
+      <pinch-zoom [backgroundColor]="'rgba(0,0,0,0)'" [overflow]="'visible'" [limit-zoom]="4" [autoHeight]="true">
+        <img [src]="image" class="img" />
       </pinch-zoom>
     </ion-col>
   </ion-row>
-  <!-- <ion-row>
-    <ion-col size="12">
-      {{size}} ko
-    </ion-col>
-  </ion-row> -->
 </ion-grid>
 <div class="absolute_bottom">
   <ion-grid>
@@ -34,3 +28,7 @@
     <ion-icon name="close-outline"></ion-icon>
   </ion-fab-button>
 </ion-fab>
+
+<!-- <div *ngIf="editUrl" #element>
+  <app-edit-image [imageSourceUrl]="editUrl" (imageSourceUrlChange)="onEditValidate($event)" (onClose)="onEditClose($event)"></app-edit-image>
+</div> -->

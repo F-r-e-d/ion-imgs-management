@@ -21,8 +21,8 @@ export class FilepickerService {
       const compressedImage = await this.imageCompress.compressFile(
         uploadFile.image,
         uploadFile.orientation,
-        50,
-        50
+        70,
+        70
       ); // 50% ratio, 50% quality
 
       return await this.saveFile(compressedImage);

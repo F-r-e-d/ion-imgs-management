@@ -1,10 +1,20 @@
 import { Platform } from '@ionic/angular';
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Injectable,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { PhotoService } from '../../services/photoService/photo.service';
 import { PhotoInt } from '../../interfaces/PhotoInt';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
+@Injectable({
+  providedIn: 'root',
+})
 @Component({
   selector: 'app-take-photo',
   templateUrl: './take-photo.component.html',
@@ -12,7 +22,9 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader';
 })
 export class TakePhotoComponent implements OnInit {
   @Input() imagesModel: Array<Record<string, any>> = [];
-  @Output() imagesModelChange: EventEmitter<Array<Record<string, any>>> =
+  // @Output() imagesModelChange: EventEmitter<Array<Record<string, any>>> =
+  //   new EventEmitter();
+  @Output() onImagesChange: EventEmitter<Array<Record<string, any>>> =
     new EventEmitter();
 
   @Input() buttonText: string | undefined = undefined;
@@ -32,7 +44,7 @@ export class TakePhotoComponent implements OnInit {
     }
   }
 
-  async takePicture() {
+  async takePicture(): Promise<any> {
     const storedPhoto = await this.photoService.takeAndSavePhoto(this.compress);
 
     this.onTakePhoto.emit(storedPhoto);
@@ -40,8 +52,9 @@ export class TakePhotoComponent implements OnInit {
     if (storedPhoto) {
       const imagesCp = [...this.imagesModel];
       imagesCp.push(storedPhoto);
-      this.imagesModelChange.emit(imagesCp);
-
+      // this.imagesModelChange.emit(imagesCp);
+      this.onImagesChange.emit(imagesCp);
+      return storedPhoto;
     }
   }
 }

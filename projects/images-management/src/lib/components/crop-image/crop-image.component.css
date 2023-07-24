@@ -4,8 +4,17 @@
 }
 
 .skeleton {
-  width: 80%;
-  height: 300px;
+  width: 25rem;
+  height: 20rem;
   display: inline-block;
 }
 
+.absolute_bottom {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.img {
+  max-height: 85vh !important;
+}

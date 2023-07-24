@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lumanosimo&family=Roboto:ital,wght@0,400;1,300&display=swap");
+
 .wrapper {
   width: 50%;
   position: relative;
@@ -10,13 +12,46 @@
   border: rgb(0 0 0 / 22%) 1px solid;
   border-radius: 10px;
   cursor: pointer;
-  height: 200px;
+  height: 202px;
   width: 150px;
   display: grid;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 4px 16px;
+}
+
+
+
+.mask {
+  background: linear-gradient(
+    1deg,
+    rgb(0 0 0 / 65%) 0%,
+    rgb(224 224 224 / 5%) 43%,
+    rgb(255 255 255 / 0%) 100%
+  );
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  border-radius: 10px;
 }
 
 .img_::part(image) {
   border-radius: 10px;
+  max-height: 200px;
+  max-width: 150px;
+}
+
+@media (max-width: 450px) {
+  .container_button {
+    height: 320px;
+    width: 230px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .img_::part(image) {
+    border-radius: 10px;
+    max-height: 318px;
+    max-width: 230px;
+  }
 }
 
 .remove_photo_button {
@@ -29,21 +64,6 @@
   --padding-start: 0;
   --padding-top: 0;
 }
-/* .edit_photo_button {
-  width: 35px;
-  height: 35px;
-
-  --padding-bottom: 0;
-  --padding-end: 0;
-  --padding-start: 0;
-  --padding-top: 0;
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  z-index: 11;
-} */
-
-
 .crop_button {
   width: 60px;
   height: 60px;
@@ -70,8 +90,30 @@
   justify-content: space-between;
 }
 
-ion-modal{
+ion-modal {
   --width: 90% !important;
   --height: 90% !important;
 }
 
+.skeleton {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  max-height: 200px;
+  max-width: 150px;
+}
+
+.opacity_0 {
+  opacity: 0;
+}
+
+.img_label {
+  color: #fff;
+  position: absolute;
+  bottom: 6px;
+  width: 100%;
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  font-style: italic;
+  font-size: 0.8em;
+}

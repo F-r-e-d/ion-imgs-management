@@ -8,11 +8,12 @@ import { PhotoService } from '../../services/photoService/photo.service';
   styleUrls: ['./crop-image.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class CropImageComponent implements OnInit {
-  @Input() imageSourceUrl: Record<string, any> = {};
 
-  croppedImage: Record<string, any> = {};
-  base64: string = '';
+export class CropImageComponent implements OnInit {
+  @Input() private imageSourceUrl: Record<string, any> = {};
+
+  public croppedImage: Record<string, any> = {};
+  public base64: string = '';
 
   constructor(
     private modalController: ModalController,

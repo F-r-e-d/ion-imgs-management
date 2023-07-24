@@ -13,22 +13,22 @@ export class FilePickerComponent implements OnInit {
   @Input() compress: boolean = false;
 
   @Input() imagesModel: Array<Record<string, any>> = [];
-  @Output() imagesModelChange: EventEmitter<Array<Record<string, any>>> = new EventEmitter();
+  // @Output() imagesModelChange: EventEmitter<Array<Record<string, any>>> = new EventEmitter();
 
   // @Input() multiple: boolean = false;
-  @Input() image: Record<string, any> = {};
-  @Output() imageChange: EventEmitter<Record<string, any>> = new EventEmitter();
+  // @Input() private image: Record<string, any> = {};
+  // @Output() imageChange: EventEmitter<Record<string, any>> = new EventEmitter();
 
 
-  @Input() buttonText: string = '';
-  @Input() color: string = 'primary';
+  @Input() public buttonText: string = '';
+  @Input() public color: string = 'primary';
 
   @Output() onImagesChange: EventEmitter<
     Array<Record<string, any>> | Record<string, any>
   > = new EventEmitter();
 
-  capacitor = Capacitor;
-  isLoading = false;
+  protected capacitor = Capacitor;
+  public isLoading = false;
 
   constructor(
     public filepickerService: FilepickerService,
@@ -44,13 +44,10 @@ export class FilePickerComponent implements OnInit {
     const storedImages = await this.filepickerService.compressFile(this.compress);
 
     if (storedImages) {
-
       const imagesCp = [...this.imagesModel];
       imagesCp.push(storedImages);
-      this.imagesModelChange.emit(imagesCp);
 
-      this.onImagesChange.emit(storedImages);
-
+      this.onImagesChange.emit(imagesCp);
     }
     this.isLoading = false;
   }

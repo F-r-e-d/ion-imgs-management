@@ -1,32 +1,50 @@
-<ion-card class="">
+<!-- <ion-card #card *ngIf="imagesModel"> -->
+<ion-card #card class="opacity_0">
   <ion-card-header>
     <ion-card-title>{{ title }}</ion-card-title>
   </ion-card-header>
   <ion-card-content>
 
-    <div class="rows" *ngIf="sourceDisplayedPhotos.length">
-      <div *ngFor="let source of sourceDisplayedPhotos">
+    <div class="rows">
+      <div *ngFor="let source of sourceDisplayedPhotos; let index = index" #imgsView>
+
         <div class="container_button">
+          <div class="mask" (click)="openImageViewer(source, index)">
+            <div class="img_label">
+            <span *ngIf="displayLabel">
+              {{ source.fileName.split('.')[0] | date:'dd/MM/yyyy HH:mm'}}
+            </span><br>
+            <span class="ion-text-end">{{ ((source.fileInfo.size / 1000) | number:'1.0-0') + ' ko' }}</span>
+          </div>
+          </div>
           <ion-button mode="md" shape="round" size="small" (click)="presentAlertRemove(source)" color="danger"
             class="remove_photo_button">
             <ion-icon name="close-outline"></ion-icon>
           </ion-button>
-          <ion-img [src]="source|readFile:update|async" (click)="openImageViewer(source)" class="img_"></ion-img>
+
+          <ion-img *ngIf="source.image" [src]="source.image"
+             class="img_"></ion-img>
+          <ion-thumbnail class="skeleton" *ngIf="!source.image">
+            <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
+          </ion-thumbnail>
         </div>
       </div>
-
     </div>
 
     <ion-grid>
       <ion-row>
         <ion-col offset="6"></ion-col>
         <ion-col size="4" class="ion-text-end">
-          <app-take-photo [compress]="compress" [imagesModel]="imagesModel" (imagesModelChange)="imagesModelChangeF($event)"></app-take-photo>
-          <app-file-picker [compress]="compress" [imagesModel]="imagesModel"
-          (imagesModelChange)="imagesModelChangeF($event)"></app-file-picker>
+          <app-file-picker *ngIf="filePicker" [compress]="compress" [imagesModel]="imagesModel"
+          (onImagesChange)="imagesModelChangeF($event)"></app-file-picker>
+          <app-take-photo *ngIf="takePhoto" [compress]="compress" [imagesModel]="imagesModel"
+            (onImagesChange)="imagesModelChangeF($event)"></app-take-photo>
         </ion-col>
-
       </ion-row>
     </ion-grid>
   </ion-card-content>
 </ion-card>
+
+<!-- <div *ngIf="editUrl" >
+  <app-edit-image [imageSourceUrl]="editUrl" (imageSourceUrlChange)="onEditValidate($event)" (onClose)="onEditClose($event)"></app-edit-image>
+</div> -->

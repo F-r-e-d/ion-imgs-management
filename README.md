@@ -72,10 +72,11 @@ import { ImagesManagementService } from 'images-management';
 # debug
 If module not found on test app
 ```Powershell
+npm root -g
 rmdir 'C:/Users/.../AppData/Roaming/npm/node_modules/images-management'
 cd dist/images-management
 npm unlink images-management
-ng build --watch
+ng build --watch (at root)
 MAYBE npm i in dist/project
 npm link
 ```

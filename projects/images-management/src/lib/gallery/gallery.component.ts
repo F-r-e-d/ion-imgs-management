@@ -1,32 +1,61 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
   Input,
+  OnInit,
   Output,
+  QueryList,
+  SimpleChanges,
   ViewChild,
+  ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import {
+  AlertController,
+  AnimationController,
+  IonCard,
+  ModalController,
+} from '@ionic/angular';
 
 import { PhotoService } from '../services/photoService/photo.service';
 import { cloneDeep } from 'lodash';
 import { PhotoInt } from '../interfaces/PhotoInt';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
-import { EditImageComponent } from '../components/edit-image/edit-image.component';
+
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { TakePhotoComponent } from './../components/take-photo/take-photo.component';
 
 @Component({
   selector: 'ion-imgs-management',
   templateUrl: './gallery.component.html',
   styleUrls: ['./gallery.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
-export class GalleryComponent {
-  @ViewChild('myimg') myimg: Partial<ElementRef> = {};
+export class GalleryComponent implements OnInit, AfterViewInit {
+  @ViewChild(IonCard, { read: ElementRef })
+  card!: ElementRef<HTMLIonCardElement>;
+  // @ViewChild(IonImg, { read: ElementRef })
+  // img!: ElementRef<HTMLIonImgElement>;
+
+  @ViewChildren('imgsView') private imgsView!: QueryList<ElementRef>;
 
   @Input() images: Array<any> = [];
-  @Input() imagesModel: Array<any> = [];
+  @Input() takePhotoOnOpen = false;
+  @Input() filePicker = true;
+  @Input() takePhoto = true;
+  @Input() displayLabel = true;
+  // @Input() imagesModel: Array<any> | undefined = undefined;
+  @Input()
+  set imagesModel(value: Array<any>) {
+    this.watcher.next(value);
+  }
+
+  get imagesModel(): any {
+    return this.watcher.value;
+  }
   @Output() imagesModelChange: EventEmitter<Array<any>> = new EventEmitter<
     Array<any>
   >();
@@ -38,21 +67,63 @@ export class GalleryComponent {
   public isLoading = false;
   public update = '';
 
+  public imageModifiedIndex: number | null = null;
+
+  public watcher: BehaviorSubject<any> = new BehaviorSubject<any>(undefined);
+  private initialized = false;
+
+  public editUrl: Record<string, any> | null = null;
+
+  public index: number | null = null;
+
   constructor(
     private modalController: ModalController,
     private photoService: PhotoService,
-    private alertController: AlertController
-  ) { }
+    private alertController: AlertController,
+    private animationCtrl: AnimationController,
+    private photoComponent: TakePhotoComponent
+  ) {}
 
   ngOnInit() {
-    setTimeout(() => {
+    this.photoService.isLoading.subscribe((value) => {
+      this.isLoading = value;
+    });
+    this.watcher.subscribe((item: any) => {
+      if (item.length && this.initialized === false) {
+        this.sourceDisplayedPhotos = cloneDeep(item);
+        this.initialized = true;
+        this.loadImages();
+      }
+    });
+  }
 
-      this.photoService.isLoading.subscribe((value) => {
-        this.isLoading = value;
-      });
-      this.sourceDisplayedPhotos = cloneDeep(this.imagesModel);
+  async ngAfterViewInit() {
+    this.enterAnimation();
 
-    }, 500);
+    if (this.takePhotoOnOpen) {
+      // this.takePicture();
+      const ev = await this.photoComponent.takePicture();
+      // console.log(ev);
+      const image = await this.photoService.readFile(ev)
+      this.sourceDisplayedPhotos.push({...ev, image});
+      this.emitChange()
+    }
+  }
+
+  async enterAnimation() {
+    await this.animationCtrl
+      .create()
+      .addElement(this.card.nativeElement)
+      .duration(1000)
+      .fromTo('opacity', '0', '1')
+      .play();
+  }
+
+  public async loadImages() {
+    for (const source of this.sourceDisplayedPhotos) {
+      const image = await this.photoService.readFile(source);
+      source.image = image;
+    }
   }
 
   dismissModal() {
@@ -82,6 +153,12 @@ export class GalleryComponent {
     await alert.present();
   }
 
+  public async updateModifiedImage(index: number) {
+    if (index !== null) {
+      const source = this.sourceDisplayedPhotos[index];
+      source.image = await this.photoService.readFile(source);
+    }
+  }
 
   async removePhoto(source: any) {
     let index: number | null = null;
@@ -99,59 +176,35 @@ export class GalleryComponent {
           path: `images-management-library-docs/${source.fileName}`,
           directory: Directory.Data,
         });
-      } catch (error) {
-
-      }
-
+      } catch (error) {}
     }
+    this.imagesModel = this.imagesModel.filter(
+      (item: PhotoInt) => item.fileName !== source.fileName
+    );
     this.emitChange();
 
     return index;
   }
 
-  async takePicture() {
-    const storedPhoto = await this.photoService.takeAndSavePhoto();
-    if (storedPhoto) {
-      this.formatPhoto(storedPhoto);
-    }
-    this.emitChange();
-  }
+  async openImageViewer(imageSourceUrl: Record<string, any>, index: number) {
+    this.index = index;
 
-  async openImageViewer(imageSourceUrl: string) {
     const modal = await this.modalController.create({
       component: ImageViewerComponent,
       componentProps: { imageSourceUrl },
+      cssClass: '',
     });
     modal.onDidDismiss().then(async (datas) => {
-      if (datas?.data?.update !== undefined) {
-        this.update = String(Math.random());
-      }
-
+      // if (datas?.data?.edit) {
+        this.editUrl = imageSourceUrl;
+      // }
+      // if (datas?.data?.update) {
+        this.updateModifiedImage(index);
+      // }
     });
     return await modal.present();
   }
 
-  /**
-   * It opens a modal that allows the user to edit the image
-   * @param imageSourceUrl - The source of the image that is going to be edited.
-   * @returns The modal is being returned.
-   */
-  async openEditImage(imageSourceUrl: any) {
-    const modal = await this.modalController.create({
-      component: EditImageComponent,
-      cssClass: 'edit_image_modal',
-      componentProps: { imageSourceUrl },
-    });
-    modal.onDidDismiss().then(async (datas) => {
-      /* Checking if the data is not undefined. If it is not, it is calling the editPicture function from the
-      photoService. */
-      if (datas?.data !== undefined) {
-        await this.photoService.editPicture(datas.data);
-      this.update = String(Math.random());
-      }
-    });
-    return await modal.present();
-  }
 
   /**
    * It takes a photo object, and then reads the file from the filesystem, and then adds it to the
@@ -159,10 +212,7 @@ export class GalleryComponent {
    * @param photo - {
    * @param [index=null] - the index of the photo in the array
    */
-  formatPhoto(
-    photo: Partial<PhotoInt>,
-    index: number | null = null
-  ) {
+  formatPhoto(photo: Partial<PhotoInt>, index: number | null = null) {
     if (index === null) {
       index = this.sourceDisplayedPhotos.length;
     }
@@ -171,15 +221,24 @@ export class GalleryComponent {
       filepath: photo?.fileName,
       fileName: photo.fileName,
     });
-
+    // this.updateModifiedImage(index);
   }
   emitChange() {
-    this.imagesModelChange.emit(this.sourceDisplayedPhotos);
+    const imgs = cloneDeep(this.sourceDisplayedPhotos).map(
+      (item: Record<string, any>) => {
+        const obj = { ...item };
+        delete obj.image;
+        return obj;
+      }
+    );
+
+    this.imagesModelChange.emit(imgs);
   }
 
   imagesModelChangeF(event: any) {
-    this.imagesModel = event;
-    this.sourceDisplayedPhotos = this.imagesModel;
+    // this.imagesModel = event;
+    this.sourceDisplayedPhotos.push(event[event.length - 1]);
+    this.loadImages();
     this.emitChange();
   }
 
