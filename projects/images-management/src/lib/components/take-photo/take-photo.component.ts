@@ -31,6 +31,8 @@ export class TakePhotoComponent implements OnInit {
   @Input() color: string = 'secondary';
   @Input() compress: boolean = false;
 
+  @Input() path: string = '';
+
   @Output() onTakePhoto: EventEmitter<Partial<PhotoInt> | null> =
     new EventEmitter();
 
@@ -44,8 +46,14 @@ export class TakePhotoComponent implements OnInit {
     }
   }
 
-  async takePicture(): Promise<any> {
-    const storedPhoto = await this.photoService.takeAndSavePhoto(this.compress);
+  async takePicture(path: string = ''): Promise<any> {
+    if (this.path) {
+      path = this.path;
+    }
+    const storedPhoto = await this.photoService.takeAndSavePhoto(
+      path,
+      this.compress
+    );
 
     this.onTakePhoto.emit(storedPhoto);
 

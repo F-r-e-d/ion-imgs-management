@@ -14,7 +14,7 @@
             <span *ngIf="displayLabel">
               {{ source.fileName.split('.')[0] | date:'dd/MM/yyyy HH:mm'}}
             </span><br>
-            <span class="ion-text-end">{{ ((source.fileInfo.size / 1000) | number:'1.0-0') + ' ko' }}</span>
+            <span class="ion-text-end">{{ source?.fileInfo ? ((source.fileInfo.size / 1000) | number:'1.0-0') + ' ko'  : ''}}</span>
           </div>
           </div>
           <ion-button mode="md" shape="round" size="small" (click)="presentAlertRemove(source)" color="danger"
@@ -36,9 +36,9 @@
         <ion-col offset="6"></ion-col>
         <ion-col size="4" class="ion-text-end">
           <app-file-picker *ngIf="filePicker" [compress]="compress" [imagesModel]="imagesModel"
-          (onImagesChange)="imagesModelChangeF($event)"></app-file-picker>
+          (onImagesChange)="imagesModelChangeF($event)" [path]="path"></app-file-picker>
           <app-take-photo *ngIf="takePhoto" [compress]="compress" [imagesModel]="imagesModel"
-            (onImagesChange)="imagesModelChangeF($event)"></app-take-photo>
+            (onImagesChange)="imagesModelChangeF($event)" [path]="path"></app-take-photo>
         </ion-col>
       </ion-row>
     </ion-grid>

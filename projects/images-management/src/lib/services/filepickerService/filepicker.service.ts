@@ -14,7 +14,7 @@ export class FilepickerService {
 
   constructor(private imageCompress: NgxImageCompressService) {}
 
-  async compressFile(compress = false) {
+  async compressFile(path = 'images-management-library-docs', compress = false) {
     const uploadFile = await this.imageCompress.uploadFile();
 
     if (compress) {
@@ -25,13 +25,13 @@ export class FilepickerService {
         70
       ); // 50% ratio, 50% quality
 
-      return await this.saveFile(compressedImage);
+      return await this.saveFile(path, compressedImage);
     }
 
-    return await this.saveFile(uploadFile.image);
+    return await this.saveFile(path, uploadFile.image);
   }
 
-  async saveFile(data: string): Promise<Partial<PhotoInt>> {
+  async saveFile(path: string, data: string): Promise<Partial<PhotoInt>> {
     // Write the file to the data directory
     // const ext = file.mimeType.split('/')[1];
 
@@ -40,14 +40,14 @@ export class FilepickerService {
     const fileName = new Date().getTime() + '.' + ext;
 
     const savedFile = await Filesystem.writeFile({
-      path: `images-management-library-docs/${fileName}`,
+      path: `${path}/${fileName}`,
       data: data,
       directory: Directory.Data,
       recursive: true,
     });
 
     const fileInfo = await Filesystem.stat({
-      path: `images-management-library-docs/${fileName}`,
+      path: `${path}/${fileName}`,
       directory: Directory.Data,
     })
 

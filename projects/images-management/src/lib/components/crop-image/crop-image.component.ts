@@ -11,6 +11,7 @@ import { PhotoService } from '../../services/photoService/photo.service';
 
 export class CropImageComponent implements OnInit {
   @Input() private imageSourceUrl: Record<string, any> = {};
+  @Input() path = 'images-management-library-docs';
 
   public croppedImage: Record<string, any> = {};
   public base64: string = '';
@@ -24,7 +25,7 @@ export class CropImageComponent implements OnInit {
 
   async ionViewDidEnter() {
     if (this.imageSourceUrl) {
-      this.base64 = await this.photoService.readFile(this.imageSourceUrl);
+      this.base64 = await this.photoService.readFile(this.path, this.imageSourceUrl);
       // this.imageSourceUrl.base64 = `data:image/jpeg;base64,${this.imageSourceUrl.base64}`;
     }
   }

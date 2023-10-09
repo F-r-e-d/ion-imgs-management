@@ -4,7 +4,7 @@ import {
   ElementRef,
   Input,
   OnInit,
-  Renderer2,
+  // Renderer2,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -26,6 +26,9 @@ export class ImageViewerComponent implements OnInit {
   @ViewChild('element') element: ElementRef | null = null;
 
   @Input() imageSourceUrl: Record<string, any> = {};
+  @Input() path = 'images-management-library-docs';
+  @Input() textMarkers = false;
+
 
   public image: string | null = null;
   public update = false;
@@ -36,14 +39,14 @@ export class ImageViewerComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private photoService: PhotoService,
-    private elementRef: ElementRef,
-    private renderer: Renderer2
+    // private elementRef: ElementRef,
+    // private renderer: Renderer2
   ) {}
 
   ngOnInit() {}
 
   async ionViewWillEnter() {
-    this.image = await this.photoService.readFile(this.imageSourceUrl);
+    this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
   }
 
 
@@ -68,15 +71,15 @@ export class ImageViewerComponent implements OnInit {
     const modal = await this.modalController.create({
       component: EditImageComponent,
       cssClass:  '',
-      componentProps: { imageSourceUrl },
+      componentProps: { imageSourceUrl, path: this.path, textMarkers: this.textMarkers },
     });
     modal.onDidDismiss().then(async (datas) => {
       /* Checking if the data is not undefined. If it is not, it is calling the editPicture function from the
       photoService. */
       if (datas?.data !== undefined) {
-        await this.photoService.editPicture(datas.data);
+        await this.photoService.editPicture(this.path, datas.data);
 
-        this.image = await this.photoService.readFile(this.imageSourceUrl);
+        this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
         this.update = true;
 
       }
@@ -114,13 +117,13 @@ export class ImageViewerComponent implements OnInit {
     const modal = await this.modalController.create({
       component: CropImageComponent,
       cssClass: 'modal-window',
-      componentProps: { imageSourceUrl },
+      componentProps: { imageSourceUrl, path: this.path },
     });
     modal.onDidDismiss().then(async (datas) => {
       if (datas?.data !== undefined) {
-        await this.photoService.editPicture(datas.data);
+        await this.photoService.editPicture(this.path, datas.data);
         // this.modalController.dismiss({ filepath: savedPicture.filepath, fileName: savedPicture.fileName });
-        this.image = await this.photoService.readFile(this.imageSourceUrl);
+        this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
         this.update = true;
       }
     });

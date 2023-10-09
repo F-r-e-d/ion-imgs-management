@@ -7,7 +7,7 @@ import {
   OnInit,
   Output,
   QueryList,
-  SimpleChanges,
+  // SimpleChanges,
   ViewChild,
   ViewChildren,
   ViewEncapsulation,
@@ -47,6 +47,9 @@ export class GalleryComponent implements OnInit, AfterViewInit {
   @Input() filePicker = true;
   @Input() takePhoto = true;
   @Input() displayLabel = true;
+  @Input() path = 'images-management-library-docs';
+  @Input() textMarkers = false;
+
   // @Input() imagesModel: Array<any> | undefined = undefined;
   @Input()
   set imagesModel(value: Array<any>) {
@@ -102,9 +105,9 @@ export class GalleryComponent implements OnInit, AfterViewInit {
 
     if (this.takePhotoOnOpen) {
       // this.takePicture();
-      const ev = await this.photoComponent.takePicture();
+      const ev = await this.photoComponent.takePicture(this.path);
       // console.log(ev);
-      const image = await this.photoService.readFile(ev)
+      const image = await this.photoService.readFile(this.path, ev)
       this.sourceDisplayedPhotos.push({...ev, image});
       this.emitChange()
     }
@@ -121,7 +124,7 @@ export class GalleryComponent implements OnInit, AfterViewInit {
 
   public async loadImages() {
     for (const source of this.sourceDisplayedPhotos) {
-      const image = await this.photoService.readFile(source);
+      const image = await this.photoService.readFile(this.path, source);
       source.image = image;
     }
   }
@@ -144,7 +147,7 @@ export class GalleryComponent implements OnInit, AfterViewInit {
           text: 'Supprimer',
           role: 'confirm',
           handler: () => {
-            this.removePhoto(source);
+            this.removePhoto(this.path, source);
           },
         },
       ],
@@ -156,11 +159,11 @@ export class GalleryComponent implements OnInit, AfterViewInit {
   public async updateModifiedImage(index: number) {
     if (index !== null) {
       const source = this.sourceDisplayedPhotos[index];
-      source.image = await this.photoService.readFile(source);
+      source.image = await this.photoService.readFile(this.path, source);
     }
   }
 
-  async removePhoto(source: any) {
+  async removePhoto(path: string, source: any) {
     let index: number | null = null;
     if (source) {
       index = this.sourceDisplayedPhotos.findIndex(
@@ -173,7 +176,7 @@ export class GalleryComponent implements OnInit, AfterViewInit {
 
       try {
         await Filesystem.deleteFile({
-          path: `images-management-library-docs/${source.fileName}`,
+          path: `${path}/${source.fileName}`,
           directory: Directory.Data,
         });
       } catch (error) {}
@@ -191,8 +194,8 @@ export class GalleryComponent implements OnInit, AfterViewInit {
 
     const modal = await this.modalController.create({
       component: ImageViewerComponent,
-      componentProps: { imageSourceUrl },
-      cssClass: '',
+      componentProps: { imageSourceUrl, path: this.path, textMarkers: this.textMarkers },
+      cssClass: 'image_viewer_modal',
     });
     modal.onDidDismiss().then(async (datas) => {
       // if (datas?.data?.edit) {

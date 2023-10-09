@@ -70,7 +70,17 @@ import { ImagesManagementService } from 'images-management';
 
 
 # debug
-If module not found on test app
+*cd dist/images-management*
+*ng build --watch*
+*cd dist/project*
+*npm link*
+
+in test app :
+-> Install all dependencies
+-> *npm link images-management*
+
+OLD:
+<!-- If module not found on test app
 ```Powershell
 npm root -g
 rmdir 'C:/Users/.../AppData/Roaming/npm/node_modules/images-management'
@@ -80,7 +90,7 @@ ng build --watch (at root)
 MAYBE npm i in dist/project
 npm link
 ```
-Verify in "C:/Users/.../AppData/Roaming/npm/node_modules/images-management" if node_modules exist
+Verify in "C:/Users/.../AppData/Roaming/npm/node_modules/images-management" if node_modules exist -->
 
 # Build & publish
 https://devdactic.com/build-ionic-library-npm

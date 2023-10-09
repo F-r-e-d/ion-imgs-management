@@ -7,17 +7,17 @@ import { Directory, Filesystem } from '@capacitor/filesystem';
 export class ImagesManagementService {
   constructor() {}
 
-  async listImages() {
+  async listImages(path: string) {
     return await Filesystem.readdir({
-      path: 'images-management-library-docs',
+      path: path,
       directory: Directory.Data,
     });
   }
 
-  async getImageUri(name: string): Promise<string | null> {
+  async getImageUri(path: string, name: string): Promise<string | null> {
     try {
       const img = await Filesystem.getUri({
-        path: 'images-management-library-docs/' + name,
+        path: path + '/' + name,
         directory: Directory.Data,
       });
 
@@ -27,10 +27,10 @@ export class ImagesManagementService {
       return null;
     }
   }
-  async getImageBase64(name: string): Promise<string | null> {
+  async getImageBase64(path: string, name: string): Promise<string | null> {
     try {
       const img = await Filesystem.readFile({
-        path: 'images-management-library-docs/' + name,
+        path: path + '/' + name,
         directory: Directory.Data,
       });
 
@@ -41,11 +41,11 @@ export class ImagesManagementService {
       return null;
     }
   }
-  
-  async getImageSize(name: string): Promise<number | null> {
+
+  async getImageSize(path: string, name: string): Promise<number | null> {
     try {
       const img = await Filesystem.stat({
-        path: 'images-management-library-docs/' + name,
+        path: path + '/' + name,
         directory: Directory.Data,
       });
 

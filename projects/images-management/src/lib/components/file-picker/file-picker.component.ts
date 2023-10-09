@@ -13,12 +13,8 @@ export class FilePickerComponent implements OnInit {
   @Input() compress: boolean = false;
 
   @Input() imagesModel: Array<Record<string, any>> = [];
-  // @Output() imagesModelChange: EventEmitter<Array<Record<string, any>>> = new EventEmitter();
 
-  // @Input() multiple: boolean = false;
-  // @Input() private image: Record<string, any> = {};
-  // @Output() imageChange: EventEmitter<Record<string, any>> = new EventEmitter();
-
+  @Input() path: string = '';
 
   @Input() public buttonText: string = '';
   @Input() public color: string = 'primary';
@@ -41,7 +37,7 @@ export class FilePickerComponent implements OnInit {
 
     this.isLoading = true;
 
-    const storedImages = await this.filepickerService.compressFile(this.compress);
+    const storedImages = await this.filepickerService.compressFile(this.path, this.compress);
 
     if (storedImages) {
       const imagesCp = [...this.imagesModel];

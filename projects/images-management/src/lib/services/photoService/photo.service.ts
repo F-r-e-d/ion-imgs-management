@@ -29,7 +29,7 @@ export class PhotoService {
    * It takes a photo, saves it to the device, and returns the saved image file.
    * @returns The savedImageFile is being returned.
    */
-  public async takeAndSavePhoto(compress: boolean = false) {
+  public async takeAndSavePhoto(path: string, compress: boolean = false) {
     this.isLoading.next(true);
 
     let quality = 100;
@@ -50,17 +50,17 @@ export class PhotoService {
     });
 
     /* Saving the photo to the device. */
-    const savedImageFile = await this.savePicture(capturedPhoto);
+    const savedImageFile = await this.savePicture(path, capturedPhoto);
 
     return savedImageFile;
   }
 
-  async editPicture(datas: any) {
+  async editPicture(path: string, datas: any) {
     /* Creating a unique file name for the image. */
     // const fileName = new Date().getTime() + '.jpeg';
     /* Saving the image to the device. */
     const savedFile = await Filesystem.writeFile({
-      path: `images-management-library-docs/${datas.fileName}`,
+      path: `${path}/${datas.fileName}`,
       data: datas.base64,
       directory: Directory.Data,
       recursive: true,
@@ -88,17 +88,17 @@ export class PhotoService {
    * Delete the file from the filesystem, and then remove the file from the array of files.
    * @param img - the image object that you want to delete
    */
-  async deleteImage(img: PhotoInt) {
+  async deleteImage(path: string, img: PhotoInt) {
     await Filesystem.deleteFile({
-      path: `images-management-library-docs/${img.fileName}`,
+      path: `${path}/${img.fileName}`,
       directory: Directory.Data,
     });
   }
 
-  async readFile(photo: any) {
+  async readFile(path: string, photo: any) {
     try {
       const file = await Filesystem.readFile({
-        path: `images-management-library-docs/${photo.fileName}`,
+        path: `${path}/${photo.fileName}`,
         directory: Directory.Data,
       });
       return `data:image/jpeg;base64,${file?.data}`;
@@ -109,6 +109,7 @@ export class PhotoService {
   }
 
   private async savePicture(
+    path: string,
     cameraPhoto: Photo
   ): Promise<Partial<PhotoInt> | null> {
     const fileName = new Date().getTime() + '.png';
@@ -122,14 +123,14 @@ export class PhotoService {
       /* Saving the image to the device. */
       try {
         const savedFile = await Filesystem.writeFile({
-          path: `images-management-library-docs/${fileName}`,
+          path: `${path}/${fileName}`,
           data: base64Data,
           directory: Directory.Data,
           recursive: true,
         });
 
         const fileInfo = await Filesystem.stat({
-          path: `images-management-library-docs/${fileName}`,
+          path: `${path}/${fileName}`,
           directory: Directory.Data,
         })
 

@@ -117,3 +117,7 @@ ion-modal {
   font-style: italic;
   font-size: 0.8em;
 }
+
+.image_viewer_modal {
+  --backdrop-opacity: 0.5;
+}

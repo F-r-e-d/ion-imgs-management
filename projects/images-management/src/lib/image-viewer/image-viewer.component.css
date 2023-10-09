@@ -31,6 +31,7 @@
 #ion-overlay-3 {
   --width: 90% !important;
   --height: 90% !important;
+  --backdrop-opacity: 0.5;
 }
 
 .absolute_bottom {
