@@ -29,8 +29,11 @@ export class TakePhotoComponent implements OnInit {
 
   @Input() buttonText: string | undefined = undefined;
   @Input() color: string = 'secondary';
-  @Input() compress: boolean = false;
 
+  @Input() quality: number | undefined = undefined;
+  @Input() width: number | undefined = undefined;
+  @Input() height: number | undefined = undefined;
+  @Input() allowEditing: boolean | undefined = undefined;
   @Input() path: string = '';
 
   @Output() onTakePhoto: EventEmitter<Partial<PhotoInt> | null> =
@@ -46,13 +49,19 @@ export class TakePhotoComponent implements OnInit {
     }
   }
 
-  async takePicture(path: string = ''): Promise<any> {
+  async takePicture(
+    path: string = '',
+    quality = 100, allowEditing = false, width = 1500, height = 1500
+  ): Promise<any> {
     if (this.path) {
       path = this.path;
     }
     const storedPhoto = await this.photoService.takeAndSavePhoto(
       path,
-      this.compress
+      quality ? quality : this.quality,
+      allowEditing ? allowEditing : this.allowEditing,
+      width ? width : this.width,
+      height ? height : this.height
     );
 
     this.onTakePhoto.emit(storedPhoto);

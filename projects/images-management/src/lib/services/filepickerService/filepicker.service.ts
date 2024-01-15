@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
 // https://github.com/dfa1234/ngx-image-compress
-import { NgxImageCompressService } from 'ngx-image-compress';
+import { NgxImageCompressService } from 'custom-ngx-image-compress';
 import { PhotoInt } from '../../interfaces/PhotoInt';
 
 @Injectable({
@@ -14,8 +14,8 @@ export class FilepickerService {
 
   constructor(private imageCompress: NgxImageCompressService) {}
 
-  async compressFile(path = 'images-management-library-docs', compress = false) {
-    const uploadFile = await this.imageCompress.uploadFile();
+  async compressFile(path = 'images-management-library-docs', compress = false, accept = 'image/*') {
+    const uploadFile = await this.imageCompress.uploadFile(accept);
 
     if (compress) {
       const compressedImage = await this.imageCompress.compressFile(

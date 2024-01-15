@@ -70,9 +70,9 @@ import { ImagesManagementService } from 'images-management';
 
 
 # debug
-*cd dist/images-management*
+*cd project/images-management*
 *ng build --watch*
-*cd dist/project*
+*cd dist/images-management*
 *npm link*
 
 in test app :

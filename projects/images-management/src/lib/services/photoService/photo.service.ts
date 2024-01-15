@@ -29,23 +29,19 @@ export class PhotoService {
    * It takes a photo, saves it to the device, and returns the saved image file.
    * @returns The savedImageFile is being returned.
    */
-  public async takeAndSavePhoto(path: string, compress: boolean = false) {
+  public async takeAndSavePhoto(path: string, quality = 100, allowEditing = false, width = 1500, height = 1500) {
     this.isLoading.next(true);
 
-    let quality = 100;
-    if (compress) {
-      quality = 60;
-    }
-
-    // Take a photo
+     // Take a photo
 
     /* Taking a photo and returning the photo as a base64 string. */
     const capturedPhoto = await Camera.getPhoto({
       resultType: CameraResultType.DataUrl,
       correctOrientation: true,
       source: CameraSource.Camera,
-      width: 1500,
-      height: 1500,
+      width: width,
+      height: height,
+      allowEditing: allowEditing,
       quality: quality
     });
 

@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   QueryList,
@@ -27,6 +28,14 @@ import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { TakePhotoComponent } from './../components/take-photo/take-photo.component';
+import { DragulaService } from 'ng2-dragula';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Subscription } from 'rxjs';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  CdkDragStart,
+} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'ion-imgs-management',
@@ -34,13 +43,13 @@ import { TakePhotoComponent } from './../components/take-photo/take-photo.compon
   styleUrls: ['./gallery.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class GalleryComponent implements OnInit, AfterViewInit {
+export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(IonCard, { read: ElementRef })
   card!: ElementRef<HTMLIonCardElement>;
   // @ViewChild(IonImg, { read: ElementRef })
   // img!: ElementRef<HTMLIonImgElement>;
 
-  @ViewChildren('imgsView') private imgsView!: QueryList<ElementRef>;
+  // @ViewChildren('imgsView') private imgsView!: QueryList<ElementRef>;
 
   @Input() images: Array<any> = [];
   @Input() takePhotoOnOpen = false;
@@ -49,6 +58,8 @@ export class GalleryComponent implements OnInit, AfterViewInit {
   @Input() displayLabel = true;
   @Input() path = 'images-management-library-docs';
   @Input() textMarkers = false;
+  @Input() lazy = true;
+  @Input() reorderable = false;
 
   // @Input() imagesModel: Array<any> | undefined = undefined;
   @Input()
@@ -63,8 +74,13 @@ export class GalleryComponent implements OnInit, AfterViewInit {
     Array<any>
   >();
 
-  @Input() title: string = '';
   @Input() compress: boolean = false;
+  @Input() accept: string = 'image/*';
+  @Input() quality: number | undefined = undefined;
+  @Input() title: string = '';
+  @Input() width: number | undefined = undefined;
+  @Input() height: number | undefined = undefined;
+  @Input() allowEditing: boolean | undefined = undefined;
 
   public sourceDisplayedPhotos: any = [];
   public isLoading = false;
@@ -79,12 +95,15 @@ export class GalleryComponent implements OnInit, AfterViewInit {
 
   public index: number | null = null;
 
+  private subscription!: Subscription;
+
   constructor(
     private modalController: ModalController,
     private photoService: PhotoService,
     private alertController: AlertController,
     private animationCtrl: AnimationController,
-    private photoComponent: TakePhotoComponent
+    private photoComponent: TakePhotoComponent,
+    private dragulaService: DragulaService
   ) {}
 
   ngOnInit() {
@@ -98,18 +117,46 @@ export class GalleryComponent implements OnInit, AfterViewInit {
         this.loadImages();
       }
     });
+
+    // this.dragulaService.cloned()
+    //   .subscribe(async (model) => {
+    //     console.log('cloned');
+
+    //     console.log(model);
+    //     // await Haptics.selectionStart();
+
+    //   })
+    this.subscription = this.dragulaService.drag().subscribe(async (model) => {
+      console.log('drag');
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+
+      console.log(model);
+    });
   }
+
+  touchStart(event: any) {
+    console.log('touchStart');
+
+    console.log(event);
+  }
+
 
   async ngAfterViewInit() {
     this.enterAnimation();
 
     if (this.takePhotoOnOpen) {
       // this.takePicture();
-      const ev = await this.photoComponent.takePicture(this.path);
+      const ev = await this.photoComponent.takePicture(
+        this.path,
+        this.quality,
+        this.allowEditing,
+        this.width,
+        this.height
+      );
       // console.log(ev);
-      const image = await this.photoService.readFile(this.path, ev)
-      this.sourceDisplayedPhotos.push({...ev, image});
-      this.emitChange()
+      const image = await this.photoService.readFile(this.path, ev);
+      this.sourceDisplayedPhotos.push({ ...ev, image });
+      this.emitChange();
     }
   }
 
@@ -194,20 +241,23 @@ export class GalleryComponent implements OnInit, AfterViewInit {
 
     const modal = await this.modalController.create({
       component: ImageViewerComponent,
-      componentProps: { imageSourceUrl, path: this.path, textMarkers: this.textMarkers },
+      componentProps: {
+        imageSourceUrl,
+        path: this.path,
+        textMarkers: this.textMarkers,
+      },
       cssClass: 'image_viewer_modal',
     });
     modal.onDidDismiss().then(async (datas) => {
       // if (datas?.data?.edit) {
-        this.editUrl = imageSourceUrl;
+      this.editUrl = imageSourceUrl;
       // }
       // if (datas?.data?.update) {
-        this.updateModifiedImage(index);
+      this.updateModifiedImage(index);
       // }
     });
     return await modal.present();
   }
-
 
   /**
    * It takes a photo object, and then reads the file from the filesystem, and then adds it to the
@@ -226,7 +276,9 @@ export class GalleryComponent implements OnInit, AfterViewInit {
     });
     // this.updateModifiedImage(index);
   }
-  emitChange() {
+  emitChange(event: any = false) {
+    console.log(event);
+
     const imgs = cloneDeep(this.sourceDisplayedPhotos).map(
       (item: Record<string, any>) => {
         const obj = { ...item };
@@ -245,5 +297,19 @@ export class GalleryComponent implements OnInit, AfterViewInit {
     this.emitChange();
   }
 
+  // drop(event: any) {
+  //   console.log(event);
+  //   moveItemInArray(
+  //     this.sourceDisplayedPhotos,
+  //     event.previousIndex,
+  //     event.currentIndex
+  //   );
+  //   this.emitChange();
+  // }
+
   ionViewDidLeave() {}
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 }

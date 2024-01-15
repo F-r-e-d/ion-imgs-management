@@ -13,9 +13,10 @@ import { FilePickerComponent } from './components/file-picker/file-picker.compon
 import 'hammerjs/hammer';
 import { TakePhotoComponent } from './components/take-photo/take-photo.component';
 import { ImagesManagementService } from './images-management.service';
-import { NgxImageCaptureModule } from 'ngx-image-compress';
+import { NgxImageCaptureModule } from 'custom-ngx-image-compress';
 import { EditImageComponent } from './components/edit-image/edit-image.component';
-
+import { DragulaModule } from 'ng2-dragula';
+// import {DragDropModule} from '@angular/cdk/drag-drop';
 
 @NgModule({
   providers: [ImagesManagementService],
@@ -34,6 +35,8 @@ import { EditImageComponent } from './components/edit-image/edit-image.component
     PinchZoomModule,
     ImageCropperModule,
     NgxImageCaptureModule,
+    DragulaModule.forRoot(),
+    // DragDropModule
   ],
   exports: [
     GalleryComponent,
