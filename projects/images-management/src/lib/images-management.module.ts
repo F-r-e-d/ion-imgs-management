@@ -16,7 +16,12 @@ import { ImagesManagementService } from './images-management.service';
 import { NgxImageCaptureModule } from 'custom-ngx-image-compress';
 import { EditImageComponent } from './components/edit-image/edit-image.component';
 import { DragulaModule } from 'ng2-dragula';
-// import {DragDropModule} from '@angular/cdk/drag-drop';
+
+import { DelayDragDirective } from './directives/delayDrag/delay-drag.directive';
+
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { MixedCdkDragDropDirective } from './directives/mixedDnD/mixed-dn-d.directive';
+
 
 @NgModule({
   providers: [ImagesManagementService],
@@ -27,7 +32,9 @@ import { DragulaModule } from 'ng2-dragula';
     CropImageComponent,
     EditImageComponent,
     FilePickerComponent,
-    TakePhotoComponent
+    TakePhotoComponent,
+    DelayDragDirective,
+    MixedCdkDragDropDirective
   ],
   imports: [
     CommonModule,
@@ -36,7 +43,7 @@ import { DragulaModule } from 'ng2-dragula';
     ImageCropperModule,
     NgxImageCaptureModule,
     DragulaModule.forRoot(),
-    // DragDropModule
+    DragDropModule,
   ],
   exports: [
     GalleryComponent,

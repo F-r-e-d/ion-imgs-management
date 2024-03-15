@@ -29,30 +29,33 @@ export class ImageViewerComponent implements OnInit {
   @Input() path = 'images-management-library-docs';
   @Input() textMarkers = false;
 
-
   public image: string | null = null;
   public update = false;
 
   public size: number | null = null;
   public editUrl: Record<string, any> | null = null;
+  public newImageDatas: Record<string, any> | null = null;
 
   constructor(
     private modalController: ModalController,
-    private photoService: PhotoService,
-    // private elementRef: ElementRef,
-    // private renderer: Renderer2
-  ) {}
+    private photoService: PhotoService
+  ) // private elementRef: ElementRef,
+  // private renderer: Renderer2
+  {}
 
   ngOnInit() {}
 
   async ionViewWillEnter() {
-    this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
+    this.image = await this.photoService.readFile(
+      this.path,
+      this.imageSourceUrl
+    );
   }
-
 
   close() {
     this.modalController.dismiss({
       update: this.update,
+      newImageDatas: this.newImageDatas,
     });
   }
 
@@ -70,41 +73,34 @@ export class ImageViewerComponent implements OnInit {
 
     const modal = await this.modalController.create({
       component: EditImageComponent,
-      cssClass:  '',
-      componentProps: { imageSourceUrl, path: this.path, textMarkers: this.textMarkers },
+      cssClass: '',
+      componentProps: {
+        imageSourceUrl,
+        path: this.path,
+        textMarkers: this.textMarkers,
+      },
     });
     modal.onDidDismiss().then(async (datas) => {
       /* Checking if the data is not undefined. If it is not, it is calling the editPicture function from the
       photoService. */
+
+
       if (datas?.data !== undefined) {
         await this.photoService.editPicture(this.path, datas.data);
-
-        this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
+        // this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
+        this.image = await this.photoService.readFile(this.path, datas.data);
         this.update = true;
-
+        delete datas.data.base64
+        delete datas.data.image
+        this.newImageDatas = datas.data;
+        this.newImageDatas = datas.data;
+        this.imageSourceUrl = datas.data
       }
     });
     return await modal.present();
   }
 
-  // async onEditValidate(value: Record<string, any>) {
 
-  //   await this.photoService.editPicture(value);
-
-  //   this.image = await this.photoService.readFile(this.imageSourceUrl);
-  //   this.update = true;
-  //   // const el = this.element?.nativeElement.closest('ion-modal');
-  //   // this.renderer.setStyle(el, 'display', 'inherit');
-  //   this.editUrl = null;
-  // }
-
-  // onEditClose(value: boolean) {
-  //   if (value) {
-  //     // const el = this.element?.nativeElement.closest('ion-modal');
-  //     // this.renderer.setStyle(el, 'display', 'inherit');
-  //     this.editUrl = null;
-  //   }
-  // }
 
   /**
    * It opens a modal that contains a component that allows the user to crop an image. When the user is
@@ -123,8 +119,14 @@ export class ImageViewerComponent implements OnInit {
       if (datas?.data !== undefined) {
         await this.photoService.editPicture(this.path, datas.data);
         // this.modalController.dismiss({ filepath: savedPicture.filepath, fileName: savedPicture.fileName });
-        this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
+        // this.image = await this.photoService.readFile(this.path, this.imageSourceUrl);
+        this.image = await this.photoService.readFile(this.path, datas.data);
+
         this.update = true;
+        delete datas.data.base64
+        delete datas.data.image
+        this.newImageDatas = datas.data;
+        this.imageSourceUrl = datas.data
       }
     });
     return await modal.present();

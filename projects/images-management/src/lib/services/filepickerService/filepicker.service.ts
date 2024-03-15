@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
 // https://github.com/dfa1234/ngx-image-compress
-import { NgxImageCompressService } from 'custom-ngx-image-compress';
+import {
+  DOC_ORIENTATION,
+  NgxImageCompressService,
+} from 'custom-ngx-image-compress';
 import { PhotoInt } from '../../interfaces/PhotoInt';
 
 @Injectable({
@@ -11,11 +14,33 @@ import { PhotoInt } from '../../interfaces/PhotoInt';
 export class FilepickerService {
   imgResultBeforeCompression: string = '';
   imgResultAfterCompression: string = '';
+ private orientation!: 'portrait' | 'landscape' | 'square';
 
   constructor(private imageCompress: NgxImageCompressService) {}
 
-  async compressFile(path = 'images-management-library-docs', compress = false, accept = 'image/*') {
+  async compressFile(
+    path = 'images-management-library-docs',
+    compress = false,
+    accept = 'image/*',
+    forceOrientation: undefined | Array<'portrait' | 'landscape' | 'square'> = undefined
+  ) {
     const uploadFile = await this.imageCompress.uploadFile(accept);
+
+    if (forceOrientation) {
+      try {
+        this.orientation = await this.detectImageOrientation(uploadFile.image);
+        console.log(this.orientation);
+      } catch (error) {
+        console.log(error);
+      }
+
+      if (!forceOrientation.includes(this.orientation)) {
+
+        throw 'Orientation incorrecte'
+      }
+    }
+
+    // this.imageCompress.getOrientation(uploadFile.)
 
     if (compress) {
       const compressedImage = await this.imageCompress.compressFile(
@@ -49,12 +74,33 @@ export class FilepickerService {
     const fileInfo = await Filesystem.stat({
       path: `${path}/${fileName}`,
       directory: Directory.Data,
-    })
+    });
 
     return {
       fileName,
       filepath: savedFile.uri,
-      fileInfo
+      fileInfo,
     };
+  }
+
+  detectImageOrientation(base64Data: string): Promise<'portrait' | 'landscape' | 'square'> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        if (width > height) {
+          resolve('landscape');
+        } else if (height > width) {
+          resolve('portrait');
+        } else {
+          resolve('square');
+        }
+      };
+      img.onerror = (error) => {
+        reject(error);
+      };
+      img.src = base64Data;
+    });
   }
 }

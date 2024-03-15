@@ -53,6 +53,19 @@ public imagesModel = [];
 - compress (optionnal): boolean => (use compression system)
     default: false
 
+- multiple (optionnal): boolean => (allow several picture)
+    default: true
+
+- textMarkers (optionnal): boolean => (display text marker)
+    default: false
+
+- reorderable (optionnal): boolean => (allow reorder pictures)
+    default: true
+
+- pickerForceOrientation(optionnal)="['landscape', 'square']" => => (picker accept only orientation)
+
+- takePhotoForceOrientation="'landscape'"(optionnal)="['landscape']" => => (take photo accept only orientation)
+
 # Utils
 import { ImagesManagementService } from 'images-management';
 

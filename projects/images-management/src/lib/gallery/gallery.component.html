@@ -1,15 +1,20 @@
-<!-- <ion-card #card *ngIf="imagesModel"> -->
 <ion-card #card class="opacity_0">
   <ion-card-header>
     <ion-card-title>{{ title }}</ion-card-title>
   </ion-card-header>
-  <ion-card-content>
+  <ion-card-content (touchmove)="$event.preventDefault()">
 
-    <div class="rows" [dragula]="reorderable ? 'DRAGULA_FACTS' : undefined" [(dragulaModel)]="sourceDisplayedPhotos" (dragulaModelChange)="emitChange($event)">
-    <!-- <div class="rows"> -->
-      <div *ngFor="let source of sourceDisplayedPhotos; let index = index" (touchstart)="touchStart($event)" class="dragdrop">
+    <div class="rows" [dragula]="reorderable ? 'DRAGULA_CONTAINER' : undefined"
+      [(dragulaModel)]="sourceDisplayedPhotos" (dragulaModelChange)="emitChange($event)"  >
+      <!-- <div class="rows" cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="sourceDisplayedPhotos" > -->
 
-        <div class="container_button" >
+      <!-- <div   class="example-container">
+      <div class="rows" cdkDropList (cdkDropListDropped)="onDrop($event)" [cdkDropListData]="sourceDisplayedPhotos" class="example-list"  >
+      <div *ngFor="let source of sourceDisplayedPhotos; let index = index" class="dragdrop example-box" [ngClass]="'container_'+index" cdkDrag (cdkDragMoved)="dragMoved($event)" > -->
+      <div *ngFor="let source of sourceDisplayedPhotos; let index = index" class="dragdrop "
+        [ngClass]="'container_'+index">
+
+        <div class="container_button">
           <div class="mask" (click)="openImageViewer(source, index)">
             <div class="img_label">
               <span *ngIf="displayLabel">
@@ -25,7 +30,7 @@
           </ion-button>
 
           <div class="img_lazy" *ngIf="!lazy && source.image">
-            <img  [src]="source.image" class="img_not_lazy" />
+            <img [src]="source.image" class="img_not_lazy" />
           </div>
           <ion-img *ngIf="lazy && source.image" [src]="source.image" class="img_"></ion-img>
           <ion-thumbnail class="skeleton" *ngIf="!source.image">
@@ -34,50 +39,24 @@
         </div>
       </div>
     </div>
-    <!-- <div class="rows" cdkDropList  (cdkDropListDropped)="drop($event)" >
-      <div *ngFor="let source of sourceDisplayedPhotos; let index = index" #imgsView cdkDrag [cdkDragStartDelay]="500"  (cdkDragStarted)="dragStart($event)" (cdkDragEntered)="dragEntered($event)" class="dragdrop">
 
-        <div class="container_button" >
-          <div class="mask" (click)="openImageViewer(source, index)">
-            <div class="img_label">
-              <span *ngIf="displayLabel">
-                {{ source.fileName.split('.')[0] | date:'dd/MM/yyyy HH:mm'}}
-              </span><br>
-              <span class="ion-text-end">{{ source?.fileInfo ? ((source.fileInfo.size / 1000) | number:'1.0-0') + ' ko'
-                : ''}}</span>
-            </div>
-          </div>
-          <ion-button mode="md" shape="round" size="small" (click)="presentAlertRemove(source)" color="danger"
-            class="remove_photo_button">
-            <ion-icon name="close-outline"></ion-icon>
-          </ion-button>
-
-          <div class="img_" *ngIf="!lazy && source.image">
-            <img  [src]="source.image" class="img_not_lazy" />
-          </div>
-          <ion-img *ngIf="lazy && source.image" [src]="source.image" class="img_"></ion-img>
-          <ion-thumbnail class="skeleton" *ngIf="!source.image">
-            <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
-          </ion-thumbnail>
-        </div>
-      </div>
-    </div> -->
 
     <ion-grid>
       <ion-row>
-        <ion-col offset="6"></ion-col>
+        <ion-col [offset]="!errorMessage ? '6' : ''" [size]="!errorMessage ? '' : '8'" class="error_message">{{
+          errorMessage }}</ion-col>
         <ion-col size="4" class="ion-text-end">
           <app-file-picker *ngIf="filePicker" [compress]="compress" [accept]="accept" [imagesModel]="imagesModel"
-            (onImagesChange)="imagesModelChangeF($event)" [path]="path"></app-file-picker>
+            (onImagesChange)="imagesModelChangeF($event)" [path]="path" [forceOrientation]="pickerForceOrientation"
+            (onError)="onFilePickerError($event)">
+          </app-file-picker>
+
           <app-take-photo *ngIf="takePhoto" [allowEditing]="allowEditing" [quality]="quality" [width]="width"
-            [height]="height" [imagesModel]="imagesModel" (onImagesChange)="imagesModelChangeF($event)"
+            [forceOrientation]="takePhotoForceOrientation" [height]="height" [imagesModel]="imagesModel"
+            (onImagesChange)="imagesModelChangeF($event)" (onError)="onFilePickerError($event)"
             [path]="path"></app-take-photo>
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-card-content>
 </ion-card>
-
-<!-- <div *ngIf="editUrl" >
-  <app-edit-image [imageSourceUrl]="editUrl" (imageSourceUrlChange)="onEditValidate($event)" (onClose)="onEditClose($event)"></app-edit-image>
-</div> -->

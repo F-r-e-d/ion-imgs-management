@@ -27,20 +27,20 @@ export class ImagesManagementService {
       return null;
     }
   }
-  async getImageBase64(path: string, name: string): Promise<string | null> {
-    try {
-      const img = await Filesystem.readFile({
-        path: path + '/' + name,
-        directory: Directory.Data,
-      });
+  // async getImageBase64(path: string, name: string): Promise<string | null> {
+  //   try {
+  //     const img = await Filesystem.readFile({
+  //       path: path + '/' + name,
+  //       directory: Directory.Data,
+  //     });
 
-      return `data:image/jpeg;base64,${img?.data}`;
+  //     return `data:image/jpeg;base64,${img?.data}`;
 
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+  //   } catch (error) {
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
 
   async getImageSize(path: string, name: string): Promise<number | null> {
     try {

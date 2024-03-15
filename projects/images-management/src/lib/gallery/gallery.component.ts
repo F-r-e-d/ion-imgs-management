@@ -3,11 +3,13 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   Input,
   OnDestroy,
   OnInit,
   Output,
   QueryList,
+  Renderer2,
   // SimpleChanges,
   ViewChild,
   ViewChildren,
@@ -31,11 +33,23 @@ import { TakePhotoComponent } from './../components/take-photo/take-photo.compon
 import { DragulaService } from 'ng2-dragula';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Subscription } from 'rxjs';
+
+
+// import {dragula} from 'ng2-dragula';
+
 import {
   CdkDragDrop,
+  CdkDragEnter,
   moveItemInArray,
+  transferArrayItem,
   CdkDragStart,
+  CdkDragExit,
+  CdkDrag,
 } from '@angular/cdk/drag-drop';
+import { MixedCdkDragSizeHelperDirective } from '../directives/mixedDnD/mixed-dn-d.directive';
+
+// declare function autoScroll(elements: any, options: any): any;
+
 
 @Component({
   selector: 'ion-imgs-management',
@@ -44,6 +58,9 @@ import {
   encapsulation: ViewEncapsulation.None,
 })
 export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('autoscrollEl',{static: false})
+  autoscrollEl!: ElementRef;
+
   @ViewChild(IonCard, { read: ElementRef })
   card!: ElementRef<HTMLIonCardElement>;
   // @ViewChild(IonImg, { read: ElementRef })
@@ -81,6 +98,12 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() width: number | undefined = undefined;
   @Input() height: number | undefined = undefined;
   @Input() allowEditing: boolean | undefined = undefined;
+  @Input() multiple: boolean = true;
+  @Input() public pickerForceOrientation:
+    | undefined
+    | Array<'portrait' | 'landscape' | 'square'> = undefined;
+  @Input() public takePhotoForceOrientation:
+  | undefined  | 'portrait' | 'landscape' = undefined;
 
   public sourceDisplayedPhotos: any = [];
   public isLoading = false;
@@ -94,7 +117,10 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
   public editUrl: Record<string, any> | null = null;
 
   public index: number | null = null;
+  public errorMessage: string | undefined;
 
+  percentWidth;
+  percentHeight;
   private subscription!: Subscription;
 
   constructor(
@@ -103,7 +129,8 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     private alertController: AlertController,
     private animationCtrl: AnimationController,
     private photoComponent: TakePhotoComponent,
-    private dragulaService: DragulaService
+    private dragulaService: DragulaService,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit() {
@@ -126,20 +153,47 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     //     // await Haptics.selectionStart();
 
     //   })
+    // this.dragulaService.createGroup('DRAGULA_CONTAINER', {});
     this.subscription = this.dragulaService.drag().subscribe(async (model) => {
-      console.log('drag');
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-
       console.log(model);
+
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      // this.renderer.addClass(document.body, 'no-scroll');
+
     });
+
+    // this.dragulaService.dragend().subscribe(async (model) => {
+    //   console.log(model);
+
+    //   this.renderer.removeClass(document.body, 'no-scroll');
+
+    // });
+
   }
 
-  touchStart(event: any) {
-    console.log('touchStart');
-
+  onDrop(event: any) {
     console.log(event);
+
+    moveItemInArray(this.sourceDisplayedPhotos, event.previousIndex, event.currentIndex);
   }
 
+  dragstart(event) {
+    console.log(event);
+    if (document.body) {
+      this.renderer.addClass(document.body, 'no-scroll');
+    }
+
+  }
+  dragend(event) {
+    console.log(event);
+    this.renderer.removeClass(document.body, 'no-scroll');
+  }
+
+  // touchStart(event: any) {
+  //   console.log('touchStart');
+
+  //   console.log(event);
+  // }
 
   async ngAfterViewInit() {
     this.enterAnimation();
@@ -203,10 +257,13 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     await alert.present();
   }
 
-  public async updateModifiedImage(index: number) {
+  public async updateModifiedImage(index: number, newImageDatas) {
     if (index !== null) {
+      this.sourceDisplayedPhotos[index] = newImageDatas;
       const source = this.sourceDisplayedPhotos[index];
       source.image = await this.photoService.readFile(this.path, source);
+      // this.sourceDisplayedPhotos.push(source);
+      this.emitChange();
     }
   }
 
@@ -249,12 +306,11 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
       cssClass: 'image_viewer_modal',
     });
     modal.onDidDismiss().then(async (datas) => {
-      // if (datas?.data?.edit) {
-      this.editUrl = imageSourceUrl;
-      // }
-      // if (datas?.data?.update) {
-      this.updateModifiedImage(index);
-      // }
+      if (datas?.data?.update) {
+        this.editUrl = datas.data.newImageDatas;
+
+        this.updateModifiedImage(index, datas.data.newImageDatas);
+      }
     });
     return await modal.present();
   }
@@ -276,12 +332,14 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     // this.updateModifiedImage(index);
   }
+
   emitChange(event: any = false) {
     console.log(event);
 
     const imgs = cloneDeep(this.sourceDisplayedPhotos).map(
       (item: Record<string, any>) => {
         const obj = { ...item };
+        delete obj.base64;
         delete obj.image;
         return obj;
       }
@@ -291,25 +349,27 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   imagesModelChangeF(event: any) {
-    // this.imagesModel = event;
-    this.sourceDisplayedPhotos.push(event[event.length - 1]);
+    if (!this.multiple) {
+      this.sourceDisplayedPhotos = [event[event.length - 1]]
+    }else{
+      this.sourceDisplayedPhotos.push(event[event.length - 1]);
+    }
     this.loadImages();
     this.emitChange();
   }
 
-  // drop(event: any) {
-  //   console.log(event);
-  //   moveItemInArray(
-  //     this.sourceDisplayedPhotos,
-  //     event.previousIndex,
-  //     event.currentIndex
-  //   );
-  //   this.emitChange();
-  // }
+  onFilePickerError(event) {
+    console.log(event);
+    this.errorMessage = event;
+  }
 
-  ionViewDidLeave() {}
+  onSizeChange(event: any) {
+    MixedCdkDragSizeHelperDirective.defaultEmitter(event, Number(this.percentWidth), Number(this.percentHeight));
+}
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

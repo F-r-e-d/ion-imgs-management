@@ -23,16 +23,25 @@ export class PhotoService {
     false
   );
 
+  private orientation!: 'portrait' | 'landscape' | 'square';
+
   constructor(private platform: Platform) {}
 
   /**
    * It takes a photo, saves it to the device, and returns the saved image file.
    * @returns The savedImageFile is being returned.
    */
-  public async takeAndSavePhoto(path: string, quality = 100, allowEditing = false, width = 1500, height = 1500) {
+  public async takeAndSavePhoto(
+    path: string,
+    quality = 100,
+    allowEditing = false,
+    width = 1500,
+    height = 1500,
+    forceOrientation: undefined | 'portrait' | 'landscape' = undefined
+  ) {
     this.isLoading.next(true);
 
-     // Take a photo
+    // Take a photo
 
     /* Taking a photo and returning the photo as a base64 string. */
     const capturedPhoto = await Camera.getPhoto({
@@ -42,8 +51,23 @@ export class PhotoService {
       width: width,
       height: height,
       allowEditing: allowEditing,
-      quality: quality
+      quality: quality,
     });
+console.log(capturedPhoto);
+
+    if (forceOrientation && capturedPhoto.dataUrl) {
+      try {
+        this.orientation = await this.detectImageOrientation(capturedPhoto.dataUrl);
+        console.log(this.orientation);
+      } catch (error) {
+        console.log(error);
+      }
+
+      if (!forceOrientation.includes(this.orientation)) {
+
+        throw 'Orientation incorrecte'
+      }
+    }
 
     /* Saving the photo to the device. */
     const savedImageFile = await this.savePicture(path, capturedPhoto);
@@ -92,12 +116,32 @@ export class PhotoService {
   }
 
   async readFile(path: string, photo: any) {
+    let mimeType: string = '';
+
+    switch (this.getFileExtension(photo.fileName)) {
+      case  "jpeg":
+         mimeType = "image/jpeg"
+         break;
+      case  "jpg":
+          mimeType = "image/jpeg"
+         break;
+
+      case  "png":
+          mimeType = "image/png"
+         break;
+
+      default:
+          mimeType = "image/png"
+         break;
+
+    }
     try {
       const file = await Filesystem.readFile({
         path: `${path}/${photo.fileName}`,
         directory: Directory.Data,
       });
-      return `data:image/jpeg;base64,${file?.data}`;
+      // return `data:image/jpeg;base64,${file?.data}`;
+      return `data:${mimeType};base64,${file?.data}`;
     } catch (error) {
       console.log(error);
     }
@@ -108,7 +152,7 @@ export class PhotoService {
     path: string,
     cameraPhoto: Photo
   ): Promise<Partial<PhotoInt> | null> {
-    const fileName = new Date().getTime() + '.png';
+    const fileName = new Date().getTime() + '.jpeg';
 
     /* Compressing the image. */
     // const base64Data = await this.compressImage(cameraPhoto, fileName);
@@ -128,14 +172,14 @@ export class PhotoService {
         const fileInfo = await Filesystem.stat({
           path: `${path}/${fileName}`,
           directory: Directory.Data,
-        })
+        });
 
         this.isLoading.next(false);
 
         return {
           fileName,
           filepath: savedFile.uri,
-          fileInfo
+          fileInfo,
         };
       } catch (error) {
         console.log(error);
@@ -143,7 +187,6 @@ export class PhotoService {
       }
     }
     return null;
-
   }
 
   private async compressImage(
@@ -213,6 +256,10 @@ export class PhotoService {
     return null;
   }
 
+  getFileExtension(fileName: string): any {
+      return fileName.split('.').pop();
+  }
+
   private getFileReader(): FileReader {
     const fileReader = new FileReader();
     // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -235,6 +282,27 @@ export class PhotoService {
         resolve(reader.result);
       };
       reader.readAsDataURL(blob);
+    });
+  }
+
+  private detectImageOrientation(base64Data: string): Promise<'portrait' | 'landscape' | 'square'> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        if (width > height) {
+          resolve('landscape');
+        } else if (height > width) {
+          resolve('portrait');
+        } else {
+          resolve('square');
+        }
+      };
+      img.onerror = (error) => {
+        reject(error);
+      };
+      img.src = base64Data;
     });
   }
 }

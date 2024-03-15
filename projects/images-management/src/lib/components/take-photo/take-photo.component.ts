@@ -11,7 +11,6 @@ import {
 import { PhotoService } from '../../services/photoService/photo.service';
 import { PhotoInt } from '../../interfaces/PhotoInt';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -35,9 +34,13 @@ export class TakePhotoComponent implements OnInit {
   @Input() height: number | undefined = undefined;
   @Input() allowEditing: boolean | undefined = undefined;
   @Input() path: string = '';
+  @Input() public forceOrientation:
+  | undefined  | 'portrait' | 'landscape' = undefined;
 
   @Output() onTakePhoto: EventEmitter<Partial<PhotoInt> | null> =
     new EventEmitter();
+
+  @Output() onError: EventEmitter<string> = new EventEmitter();
 
   constructor(private photoService: PhotoService, private platform: Platform) {}
 
@@ -51,27 +54,39 @@ export class TakePhotoComponent implements OnInit {
 
   async takePicture(
     path: string = '',
-    quality = 100, allowEditing = false, width = 1500, height = 1500
+    quality = 100,
+    allowEditing = false,
+    width = 1500,
+    height = 1500
   ): Promise<any> {
+    this.onError.emit('');
+
     if (this.path) {
       path = this.path;
     }
-    const storedPhoto = await this.photoService.takeAndSavePhoto(
-      path,
-      quality ? quality : this.quality,
-      allowEditing ? allowEditing : this.allowEditing,
-      width ? width : this.width,
-      height ? height : this.height
-    );
 
-    this.onTakePhoto.emit(storedPhoto);
+    try {
+      const storedPhoto = await this.photoService.takeAndSavePhoto(
+        path,
+        quality ? quality : this.quality,
+        allowEditing ? allowEditing : this.allowEditing,
+        width ? width : this.width,
+        height ? height : this.height,
+        this.forceOrientation
+      );
 
-    if (storedPhoto) {
-      const imagesCp = [...this.imagesModel];
-      imagesCp.push(storedPhoto);
-      // this.imagesModelChange.emit(imagesCp);
-      this.onImagesChange.emit(imagesCp);
-      return storedPhoto;
+      this.onTakePhoto.emit(storedPhoto);
+
+      if (storedPhoto) {
+        const imagesCp = [...this.imagesModel];
+        imagesCp.push(storedPhoto);
+        // this.imagesModelChange.emit(imagesCp);
+        this.onImagesChange.emit(imagesCp);
+        return storedPhoto;
+      }
+    } catch (error: any) {
+      console.log(error);
+      this.onError.emit(error);
     }
   }
 }
