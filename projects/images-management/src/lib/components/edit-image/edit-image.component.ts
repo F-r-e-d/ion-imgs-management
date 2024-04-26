@@ -80,10 +80,20 @@ export class EditImageComponent {
         //   base64: dataUrl,
         //   fileName: this.imageSourceUrl.fileName,
         // })
+        const newFileName =
+          new Date().getTime() +
+          '.' +
+          this.photoService.getFileExtension(this.imageSourceUrl.fileName);
+
         this.modalController.dismiss({
-          filepath: this.imageSourceUrl.filepath,
+          filepath: this.imageSourceUrl.filepath.replace(
+            this.imageSourceUrl.fileName,
+            newFileName
+          ),
+
           base64: dataUrl,
-          fileName: this.imageSourceUrl.fileName,
+          oldFileName: this.imageSourceUrl.fileName,
+          fileName: newFileName,
         });
       });
 

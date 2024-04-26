@@ -13,8 +13,14 @@ import { FilePickerComponent } from './components/file-picker/file-picker.compon
 import 'hammerjs/hammer';
 import { TakePhotoComponent } from './components/take-photo/take-photo.component';
 import { ImagesManagementService } from './images-management.service';
-import { NgxImageCaptureModule } from 'ngx-image-compress';
+import { NgxImageCaptureModule } from 'custom-ngx-image-compress';
 import { EditImageComponent } from './components/edit-image/edit-image.component';
+import { DragulaModule } from 'ng2-dragula';
+
+import { DelayDragDirective } from './directives/delayDrag/delay-drag.directive';
+
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { MixedCdkDragDropDirective } from './directives/mixedDnD/mixed-dn-d.directive';
 
 
 @NgModule({
@@ -26,7 +32,9 @@ import { EditImageComponent } from './components/edit-image/edit-image.component
     CropImageComponent,
     EditImageComponent,
     FilePickerComponent,
-    TakePhotoComponent
+    TakePhotoComponent,
+    DelayDragDirective,
+    MixedCdkDragDropDirective
   ],
   imports: [
     CommonModule,
@@ -34,6 +42,8 @@ import { EditImageComponent } from './components/edit-image/edit-image.component
     PinchZoomModule,
     ImageCropperModule,
     NgxImageCaptureModule,
+    DragulaModule.forRoot(),
+    DragDropModule,
   ],
   exports: [
     GalleryComponent,

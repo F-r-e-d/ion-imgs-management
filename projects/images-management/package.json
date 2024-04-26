@@ -1,6 +1,6 @@
 {
   "name": "images-management",
-  "version": "0.5.9",
+  "version": "0.9.0",
   "publishConfig": {
     "registry": "http://localhost:4873"
   },
@@ -21,10 +21,10 @@
     "@meddv/ngx-pinch-zoom": "^16.0.0",
     "@types/lodash": "^4.14.195",
     "browser-image-compression": "^2.0.2",
+    "custom-ngx-image-compress": "^15.1.8",
     "hammerjs": "^2.0.8",
     "lodash.clonedeep": "^4.5.0",
     "markerjs2": "^2.29.4",
-    "ngx-image-compress": "^15.1.6",
     "ngx-image-cropper": "^7.0.1"
   },
   "dependencies": {

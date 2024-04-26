@@ -53,6 +53,19 @@ public imagesModel = [];
 - compress (optionnal): boolean => (use compression system)
     default: false
 
+- multiple (optionnal): boolean => (allow several picture)
+    default: true
+
+- textMarkers (optionnal): boolean => (display text marker)
+    default: false
+
+- reorderable (optionnal): boolean => (allow reorder pictures)
+    default: true
+
+- pickerForceOrientation(optionnal)="['landscape', 'square']" => => (picker accept only orientation)
+
+- takePhotoForceOrientation="'landscape'"(optionnal)="['landscape']" => => (take photo accept only orientation)
+
 # Utils
 import { ImagesManagementService } from 'images-management';
 
@@ -70,9 +83,9 @@ import { ImagesManagementService } from 'images-management';
 
 
 # debug
-*cd dist/images-management*
+*cd project/images-management*
 *ng build --watch*
-*cd dist/project*
+*cd dist/images-management*
 *npm link*
 
 in test app :

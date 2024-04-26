@@ -1,32 +1,43 @@
 <ion-grid class="ion-justify-content-center ion-align-items-center d_grid">
   <ion-row>
-    <ion-col size="12" class="ion-text-center">
-      <div  class="ion-text-center">
-      <ion-thumbnail class="skeleton"*ngIf="!base64" >
-        <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
-      </ion-thumbnail>
-    </div>
-    <image-cropper *ngIf="base64" [imageBase64]="base64" [maintainAspectRatio]="false" [aspectRatio]="4 / 3" format="jpeg"
-      output="base64" class="img"
-      (imageCropped)="imageCropped($event)">
-    </image-cropper>
-  </ion-col>
-</ion-row>
+    <ion-col size="11" class="margin_auto">
+      <div class="ion-text-center">
+        <ion-thumbnail class="skeleton1" *ngIf="!base64">
+          <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
+        </ion-thumbnail>
+      </div>
+
+      <image-cropper *ngIf="base64" [canvasRotation]="canvasRotation" [(transform)]="transform" [imageBase64]="base64"
+        [maintainAspectRatio]="false" [aspectRatio]="4 / 3" format="jpeg" output="base64" class="img"
+        (imageCropped)="imageCropped($event)">
+      </image-cropper>
+
+    </ion-col>
+
+  </ion-row>
 </ion-grid>
-    <ion-grid  class="absolute_bottom">
-      <ion-row>
-        <ion-col size="12">
-          {{croppedImage.width ? (croppedImage.width + 'x' + croppedImage.height) : ''}}
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12" class="ion-text-end">
-          <ion-button (click)="validCrop()" color="success">
-            <ion-icon slot="icon-only" size="large" name="checkmark-outline"></ion-icon>
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+
+<ion-grid class="absolute_bottom">
+  <div class="ion-text-center">
+    <ion-button (click)="rotateRight()" color="medium">
+      <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      <!-- <img src="assets/rotate_img.png" /> -->
+
+    </ion-button>
+  </div>
+  <ion-row>
+    <ion-col>
+      {{croppedImage.width ? (croppedImage.width + 'x' + croppedImage.height) : ''}}
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col size="12" class="ion-text-end">
+      <ion-button (click)="validCrop()" color="success">
+        <ion-icon slot="icon-only" size="large" name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
 
 
 <ion-fab vertical="top" horizontal="end" slot="fixed">

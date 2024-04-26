@@ -16,3 +16,4 @@ export * from './lib/services/filepickerService/filepicker.service';
 
 export * from './lib/components/take-photo/take-photo.component';
 
+

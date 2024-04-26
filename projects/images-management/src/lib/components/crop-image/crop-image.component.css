@@ -3,7 +3,7 @@
   border-radius: 10px;
 }
 
-.skeleton {
+.skeleton1 {
   width: 25rem;
   height: 20rem;
   display: inline-block;
@@ -13,8 +13,14 @@
   position: absolute;
   bottom: 0;
   width: 100%;
+  z-index: 10000;
 }
 
 .img {
   max-height: 85vh !important;
+}
+
+.margin_auto {
+  margin-left: auto;
+  margin-right: auto;
 }
