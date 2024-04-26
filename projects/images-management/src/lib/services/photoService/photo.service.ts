@@ -117,6 +117,7 @@ console.log(capturedPhoto);
 
   async readFile(path: string, photo: any) {
     let mimeType: string = '';
+if (photo) {
 
     switch (this.getFileExtension(photo.fileName)) {
       case  "jpeg":
@@ -145,7 +146,10 @@ console.log(capturedPhoto);
     } catch (error) {
       console.log(error);
     }
+}
+
     return '';
+
   }
 
   private async savePicture(

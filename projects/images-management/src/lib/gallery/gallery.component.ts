@@ -20,6 +20,7 @@ import {
   AnimationController,
   IonCard,
   ModalController,
+  Platform,
 } from '@ionic/angular';
 
 import { PhotoService } from '../services/photoService/photo.service';
@@ -33,7 +34,6 @@ import { TakePhotoComponent } from './../components/take-photo/take-photo.compon
 import { DragulaService } from 'ng2-dragula';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Subscription } from 'rxjs';
-
 
 // import {dragula} from 'ng2-dragula';
 
@@ -50,7 +50,6 @@ import { MixedCdkDragSizeHelperDirective } from '../directives/mixedDnD/mixed-dn
 
 // declare function autoScroll(elements: any, options: any): any;
 
-
 @Component({
   selector: 'ion-imgs-management',
   templateUrl: './gallery.component.html',
@@ -58,7 +57,7 @@ import { MixedCdkDragSizeHelperDirective } from '../directives/mixedDnD/mixed-dn
   encapsulation: ViewEncapsulation.None,
 })
 export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('autoscrollEl',{static: false})
+  @ViewChild('autoscrollEl', { static: false })
   autoscrollEl!: ElementRef;
 
   @ViewChild(IonCard, { read: ElementRef })
@@ -103,7 +102,9 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     | undefined
     | Array<'portrait' | 'landscape' | 'square'> = undefined;
   @Input() public takePhotoForceOrientation:
-  | undefined  | 'portrait' | 'landscape' = undefined;
+    | undefined
+    | 'portrait'
+    | 'landscape' = undefined;
 
   public sourceDisplayedPhotos: any = [];
   public isLoading = false;
@@ -130,7 +131,8 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     private animationCtrl: AnimationController,
     private photoComponent: TakePhotoComponent,
     private dragulaService: DragulaService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public platform: Platform
   ) {}
 
   ngOnInit() {
@@ -159,7 +161,6 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
 
       await Haptics.impact({ style: ImpactStyle.Heavy });
       // this.renderer.addClass(document.body, 'no-scroll');
-
     });
 
     // this.dragulaService.dragend().subscribe(async (model) => {
@@ -168,13 +169,16 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     //   this.renderer.removeClass(document.body, 'no-scroll');
 
     // });
-
   }
 
   onDrop(event: any) {
     console.log(event);
 
-    moveItemInArray(this.sourceDisplayedPhotos, event.previousIndex, event.currentIndex);
+    moveItemInArray(
+      this.sourceDisplayedPhotos,
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
   dragstart(event) {
@@ -182,7 +186,6 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     if (document.body) {
       this.renderer.addClass(document.body, 'no-scroll');
     }
-
   }
   dragend(event) {
     console.log(event);
@@ -207,10 +210,14 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
         this.width,
         this.height
       );
-      // console.log(ev);
-      const image = await this.photoService.readFile(this.path, ev);
-      this.sourceDisplayedPhotos.push({ ...ev, image });
-      this.emitChange();
+      console.log(ev);
+      if (ev) {
+        const image = await this.photoService.readFile(this.path, ev);
+        this.sourceDisplayedPhotos.push({ ...ev, image });
+      }
+
+      this.emitChange('ngAfterViewInit');
+      this.takePhotoOnOpen = false
     }
   }
 
@@ -263,7 +270,7 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
       const source = this.sourceDisplayedPhotos[index];
       source.image = await this.photoService.readFile(this.path, source);
       // this.sourceDisplayedPhotos.push(source);
-      this.emitChange();
+      this.emitChange('updateModifiedImage');
     }
   }
 
@@ -288,7 +295,7 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.imagesModel = this.imagesModel.filter(
       (item: PhotoInt) => item.fileName !== source.fileName
     );
-    this.emitChange();
+    this.emitChange('removePhoto');
 
     return index;
   }
@@ -321,21 +328,19 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param photo - {
    * @param [index=null] - the index of the photo in the array
    */
-  formatPhoto(photo: Partial<PhotoInt>, index: number | null = null) {
-    if (index === null) {
-      index = this.sourceDisplayedPhotos.length;
-    }
+  // formatPhoto(photo: Partial<PhotoInt>, index: number | null = null) {
+  //   if (index === null) {
+  //     index = this.sourceDisplayedPhotos.length;
+  //   }
 
-    this.sourceDisplayedPhotos.splice(index, 0, {
-      filepath: photo?.fileName,
-      fileName: photo.fileName,
-    });
-    // this.updateModifiedImage(index);
-  }
+  //   this.sourceDisplayedPhotos.splice(index, 0, {
+  //     filepath: photo?.fileName,
+  //     fileName: photo?.fileName,
+  //   });
+  //   // this.updateModifiedImage(index);
+  // }
 
   emitChange(event: any = false) {
-    console.log(event);
-
     const imgs = cloneDeep(this.sourceDisplayedPhotos).map(
       (item: Record<string, any>) => {
         const obj = { ...item };
@@ -350,12 +355,12 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   imagesModelChangeF(event: any) {
     if (!this.multiple) {
-      this.sourceDisplayedPhotos = [event[event.length - 1]]
-    }else{
+      this.sourceDisplayedPhotos = [event[event.length - 1]];
+    } else {
       this.sourceDisplayedPhotos.push(event[event.length - 1]);
     }
     this.loadImages();
-    this.emitChange();
+    this.emitChange('imagesModelChangeF');
   }
 
   onFilePickerError(event) {
@@ -363,9 +368,15 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.errorMessage = event;
   }
 
-  onSizeChange(event: any) {
-    MixedCdkDragSizeHelperDirective.defaultEmitter(event, Number(this.percentWidth), Number(this.percentHeight));
-}
+  //   onSizeChange(event: any) {
+  //     MixedCdkDragSizeHelperDirective.defaultEmitter(event, Number(this.percentWidth), Number(this.percentHeight));
+  // }
+
+  onTouchMove(event) {
+    if (this.platform.is('mobile') && this.reorderable) {
+      event.preventDefault();
+    }
+  }
 
   ngOnDestroy(): void {
     if (this.subscription) {

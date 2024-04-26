@@ -2,7 +2,7 @@
   <ion-card-header>
     <ion-card-title>{{ title }}</ion-card-title>
   </ion-card-header>
-  <ion-card-content (touchmove)="$event.preventDefault()">
+  <ion-card-content (touchmove)="onTouchMove($event)" [ngClass]="platform.is('mobile') && reorderable ? 'mr_50' : ''">
 
     <div class="rows" [dragula]="reorderable ? 'DRAGULA_CONTAINER' : undefined"
       [(dragulaModel)]="sourceDisplayedPhotos" (dragulaModelChange)="emitChange($event)"  >

@@ -86,7 +86,10 @@ export class TakePhotoComponent implements OnInit {
       }
     } catch (error: any) {
       console.log(error);
-      this.onError.emit(error);
+      if (error instanceof Error && !error.message?.includes('cancelled')) {
+        this.onError.emit(error.message);
+
+      }
     }
   }
 }

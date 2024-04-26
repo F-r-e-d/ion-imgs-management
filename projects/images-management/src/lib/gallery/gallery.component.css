@@ -354,3 +354,7 @@ ion-modal {
 .no-scroll {
   overflow: hidden !important;
 }
+
+.mr_50 {
+  margin-right: 50px;
+}

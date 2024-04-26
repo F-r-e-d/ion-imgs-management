@@ -33,6 +33,7 @@ export class CropImageComponent implements OnInit {
   ngOnInit() {}
 
   async ionViewDidEnter() {
+
     if (this.imageSourceUrl) {
       this.base64 = await this.photoService.readFile(
         this.path,

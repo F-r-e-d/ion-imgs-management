@@ -5,6 +5,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import {
   DOC_ORIENTATION,
   NgxImageCompressService,
+  UploadResponse,
 } from 'custom-ngx-image-compress';
 import { PhotoInt } from '../../interfaces/PhotoInt';
 
@@ -14,7 +15,7 @@ import { PhotoInt } from '../../interfaces/PhotoInt';
 export class FilepickerService {
   imgResultBeforeCompression: string = '';
   imgResultAfterCompression: string = '';
- private orientation!: 'portrait' | 'landscape' | 'square';
+  private orientation!: 'portrait' | 'landscape' | 'square';
 
   constructor(private imageCompress: NgxImageCompressService) {}
 
@@ -22,43 +23,47 @@ export class FilepickerService {
     path = 'images-management-library-docs',
     compress = false,
     accept = 'image/*',
-    forceOrientation: undefined | Array<'portrait' | 'landscape' | 'square'> = undefined
+    forceOrientation:
+      | undefined
+      | Array<'portrait' | 'landscape' | 'square'> = undefined
   ) {
-    const uploadFile = await this.imageCompress.uploadFile(accept);
 
-    if (forceOrientation) {
-      try {
+    try {
+       const uploadFile = await this.imageCompress.uploadFileOrReject(accept);
+
+    if (uploadFile && forceOrientation) {
         this.orientation = await this.detectImageOrientation(uploadFile.image);
-        console.log(this.orientation);
-      } catch (error) {
-        console.log(error);
-      }
-
       if (!forceOrientation.includes(this.orientation)) {
-
-        throw 'Orientation incorrecte'
+        throw 'Orientation incorrecte';
       }
     }
 
-    // this.imageCompress.getOrientation(uploadFile.)
+      if (uploadFile && compress) {
+        const compressedImage = await this.imageCompress.compressFile(
+          uploadFile.image,
+          uploadFile.orientation,
+          70,
+          70
+        ); // 50% ratio, 50% quality
 
-    if (compress) {
-      const compressedImage = await this.imageCompress.compressFile(
-        uploadFile.image,
-        uploadFile.orientation,
-        70,
-        70
-      ); // 50% ratio, 50% quality
+        return await this.saveFile(path, compressedImage);
+      }
 
-      return await this.saveFile(path, compressedImage);
+      if (uploadFile) {
+        return await this.saveFile(path, uploadFile.image);
+      }
+    } catch (error) {
+      console.log(error);
     }
 
-    return await this.saveFile(path, uploadFile.image);
+
+    return false;
   }
 
   async saveFile(path: string, data: string): Promise<Partial<PhotoInt>> {
     // Write the file to the data directory
     // const ext = file.mimeType.split('/')[1];
+
 
     const ext = data?.split(';')[0].split('/')[1] || 'jpg';
 
@@ -83,7 +88,9 @@ export class FilepickerService {
     };
   }
 
-  detectImageOrientation(base64Data: string): Promise<'portrait' | 'landscape' | 'square'> {
+  detectImageOrientation(
+    base64Data: string
+  ): Promise<'portrait' | 'landscape' | 'square'> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
