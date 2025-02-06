@@ -91,6 +91,8 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
   >();
 
   @Input() compress: boolean = false;
+  @Input() ratio: number = 50;
+  @Input() qualityPicker: number = 50;
   @Input() accept: string = 'image/*';
   @Input() quality: number | undefined = undefined;
   @Input() title: string = '';
@@ -98,6 +100,7 @@ export class GalleryComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() height: number | undefined = undefined;
   @Input() allowEditing: boolean | undefined = undefined;
   @Input() multiple: boolean = true;
+
   @Input() public pickerForceOrientation:
     | undefined
     | Array<'portrait' | 'landscape' | 'square'> = undefined;

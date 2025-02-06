@@ -19,6 +19,8 @@ export class FilePickerComponent implements OnInit {
 
   @Input() public buttonText: string = '';
   @Input() public color: string = 'primary';
+  @Input() public ratio: number = 50;
+  @Input() public qualityPicker: number = 50;
   @Input() public forceOrientation:
     | undefined
     | Array<'portrait' | 'landscape' | 'square'> = undefined;
@@ -51,7 +53,9 @@ export class FilePickerComponent implements OnInit {
         this.path,
         this.compress,
         this.accept,
-        this.forceOrientation
+        this.forceOrientation,
+        this.ratio,
+        this.qualityPicker
       );
 
       if (storedImages) {

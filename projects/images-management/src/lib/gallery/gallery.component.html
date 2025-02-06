@@ -48,7 +48,7 @@
         <ion-col size="4" class="ion-text-end">
           <app-file-picker *ngIf="filePicker" [compress]="compress" [accept]="accept" [imagesModel]="imagesModel"
             (onImagesChange)="imagesModelChangeF($event)" [path]="path" [forceOrientation]="pickerForceOrientation"
-            (onError)="onFilePickerError($event)">
+            (onError)="onFilePickerError($event)" [ratio]="ratio" [qualityPicker]="qualityPicker">
           </app-file-picker>
 
           <app-take-photo *ngIf="takePhoto" [allowEditing]="allowEditing" [quality]="quality" [width]="width"

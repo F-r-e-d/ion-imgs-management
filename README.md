@@ -52,6 +52,10 @@ public imagesModel = [];
 
 - compress (optionnal): boolean => (use compression system)
     default: false
+- ratio (optionnal): number => (if compress === true)
+    default: 50
+- qualityPicker (optionnal): number => (if compress === true)
+    default: 50
 
 - multiple (optionnal): boolean => (allow several picture)
     default: true
@@ -105,9 +109,17 @@ npm link
 ```
 Verify in "C:/Users/.../AppData/Roaming/npm/node_modules/images-management" if node_modules exist -->
 
+
+# Pour verdaccio
+
+```terminal
+verdaccio
+```
+
 # Build & publish
 https://devdactic.com/build-ionic-library-npm
 
+Increase projects\images-management\package.json version
 
 ```root
 ng build
@@ -117,11 +129,6 @@ cd dist/project
 npm publish
 ```
 
-# Pour verdaccio
-
-```terminal
-verdaccio
-```
 
 cd projects/project_name/package.json
 "publishConfig": {

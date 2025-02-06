@@ -25,7 +25,9 @@ export class FilepickerService {
     accept = 'image/*',
     forceOrientation:
       | undefined
-      | Array<'portrait' | 'landscape' | 'square'> = undefined
+      | Array<'portrait' | 'landscape' | 'square'> = undefined,
+      ratio = 50,
+      quality = 50
   ) {
 
     try {
@@ -42,8 +44,8 @@ export class FilepickerService {
         const compressedImage = await this.imageCompress.compressFile(
           uploadFile.image,
           uploadFile.orientation,
-          70,
-          70
+          ratio,
+          quality
         ); // 50% ratio, 50% quality
 
         return await this.saveFile(path, compressedImage);
